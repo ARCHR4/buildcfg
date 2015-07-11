@@ -2,3 +2,4 @@ $cat .gitignore
 *.cmd
 *.bat
 *.exe
+unittest/ 	#So it does not appear in master
