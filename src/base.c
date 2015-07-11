@@ -224,7 +224,7 @@ void BaseUnitTest()
 	
 	printf("\n\t\t\tTEST BEGINN");
 	
-	baseOk = BaseInit("G:\\Code\\build\\unittest\\base");
+	baseOk = BaseInit("G:\\Coding\\buildcfg\\unittest\\base");
 	
 	if(!baseOk){
 		printf("\aDatei konnte nicht geoeffnnet werden\n\n");

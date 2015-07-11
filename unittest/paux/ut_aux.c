@@ -1,5 +1,5 @@
 
-#include "G:\Code\build\src\inc\p_aux.h"
+#include "G:\Coding\buildcfg\src\inc\p_aux.h"
 
 int main()
 {

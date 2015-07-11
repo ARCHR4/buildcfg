@@ -9,8 +9,8 @@
 #include <stdio.h>
 #include <windows.h>
 
-#include "G:\Code\build\src\inc\base.h"
-#include "G:\Code\build\src\inc\p_aux.h" 
+#include "inc\base.h"
+#include "inc\p_aux.h" 
 
 
 //
@@ -33,9 +33,9 @@ void** _Alloc2DArray( int size, int dim1, int dim2 )
 		if( !ret[i] ){	//Alles wieder befreien
 			for( i; i >= 0; i--){
 				free( ret[i] );
-				free(ret);
-				return nil;
 			}
+			free(ret);
+			return nil;
 		}
 	}
 	

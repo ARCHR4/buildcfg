@@ -31,6 +31,8 @@
 	int Rwd( void ); 
 	
 	int GetLineCount();
+
+	void Skip();
 	
 	#define nil ((void*) 0)
 	

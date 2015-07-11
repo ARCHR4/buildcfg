@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <windows.h>
 
-#include "G:\Projekte Git\buildcfg\src\inc\base.h"
+#include "G:\Coding\buildcfg\src\inc\base.h"
 
 
 int main( )
@@ -12,7 +12,7 @@ int main( )
 	bool initOk = false;
 	SetConsoleTitle("Unit-Test: base.c/GetLineCount()");
 	printf("\t\t\t[START]\n\n");
-	initOk = BaseInit( "G:\\Code\\build\\unittest\\GetLine");
+	initOk = BaseInit( "G:\\Coding\\buildcfg\\unittest\\GetLine");
 	if(!initOk){
 		system("pause");
 		return 0;
