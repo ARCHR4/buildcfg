@@ -32,6 +32,8 @@
 	
 	int GetLineCount();
 	
+	void Skip();
+	
 	#define nil ((void*) 0)
 	
 #endif
