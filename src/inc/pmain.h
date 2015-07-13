@@ -14,8 +14,8 @@
 	//
 	
 	typedef enum{
-		EOF = -1,  // Für GetNextVar(), um anzuzeigen dass keine weitren Variablen vorliegen
-		NIL = -1,  // Nicht definiert
+		EOF = -3,  // Für GetNextVar(), um anzuzeigen dass keine weitren Variablen vorliegen
+		NIL = -2,  // Nicht definiert
 		UNEXPECTED = -1, // Synatx Error
 		LANGUAGE,
 		COMPILER,

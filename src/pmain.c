@@ -48,8 +48,12 @@ int main(int argc, char** argv)
 		v[i] = SVInit( (SkriptToken ) i ); 
 		
 	// Datei lesen 
-	for( SkriptToken nxtVar = FindeDkl(); (nxtVar != EOF) && (nxtVar != UNEXPECTED); nxtVar = FindeDkl()){
-		LeseDkl( v[ (int) nxtVar ] );
+	for( SkriptToken nxtVar = FindeDkl(); nxtVar != EOF; nxtVar = FindeDkl()){
+		if( nxtVar != UNEXPECTED )
+			LeseDkl( v[ (int) nxtVar ] );
+		else
+			SyntaxError("Unerwartetes Symbol!");
+	}
 	
 }
 
@@ -219,7 +223,7 @@ static void LeseWert( SkriptVar* v, int indx )
 	while( Cur() != '\"'){
 	
 		if( strIndx <= strMaxIndx ){  //Reicht Platz im Array noch aus?
-			v->wert[index] = realloc( v->wert[index], strMaxWert += 20 ),
+			v->wert[index] = realloc( v->wert[index], strMaxWert += 20 );
 			if( v->wert[index] )
 				Error("Speicher-Fehler: Realloc() gibt nil zurück!");
 		}
