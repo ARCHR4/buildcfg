@@ -1,2 +1,4 @@
 # buildcfg
-A build-srcipt system (like make). Educational purpose.
+A little build-sript system for GCC (Windows).
+Mostly educational purpose.
+
