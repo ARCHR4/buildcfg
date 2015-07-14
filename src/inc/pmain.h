@@ -14,15 +14,15 @@
 	//
 	
 	typedef enum{
-		EOF = -3,  // Für GetNextVar(), um anzuzeigen dass keine weitren Variablen vorliegen
-		NIL = -2,  // Nicht definiert
+		NIL = -2,  	// Nicht definiert
 		UNEXPECTED = -1, // Synatx Error
 		LANGUAGE,
 		COMPILER,
 		OUTPUT,
 		LIBARY,
 		OPTIONS,
-		IGNOREDIR
+		IGNOREDIR,
+		GEOF = -3,	// Für GetNextVar(), um anzuzeigen dass keine weitren Variablen vorliegen
 	} SkriptToken;
 	
 	//
@@ -36,5 +36,6 @@
 		int         gr1Dim;		    // 1. Dimension des wert-Arrays
 	} SkriptVar;
 	
-
+	void PrintVar( SkriptVar* );
+	void SVDel( SkriptVar* );
 #endif

@@ -47,8 +47,10 @@ bool BaseInit(const char* projPfd )
 	
 	base->datei = fopen( tmpCpy, "r"); 
 	
-	if( !(base->datei) ) return false;
-	else printf("\tDatei erfolgreich geoeffnet, Cur(): %c\n\n", Cur() );
+	if( !(base->datei) ) 
+		return false;
+	else
+		printf("\tDatei erfolgreich geoeffnet, Cur(): %c\n\n", Cur() );
 	
 	
 	base->dir   = projPfd;
@@ -66,9 +68,9 @@ bool BaseInit(const char* projPfd )
 
 void BaseClose()
 {
-	free( base->pfad );
+	free( (void*) base->pfad );
 	fclose( base->datei );
-	free( base );
+	free( (void*) base );
 	base = nil;
 }
 

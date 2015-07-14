@@ -12,16 +12,19 @@
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "inc/base.h"
 #include "inc/p_aux.h"
 #include "inc/pmain.h"
 
+#define TEST
+
 static SkriptVar* SVInit( SkriptToken );
 
 void SVDel( SkriptVar* );
 
-static SkriptToken FindeDekl( );
+static SkriptToken FindeDkl( );
 
 static void LeseDkl();
 
@@ -39,7 +42,7 @@ int main(int argc, char** argv)
 	if( argc < 1 ){
 		Error(" Kein Pfad angegeben!");
 	}else{
-		bool baseOK = BaseInit( argv[0] );
+		bool baseOK = BaseInit( argv[1] );
 		if( !baseOK )
 			Error("Projekt-Verzeichnis konnte nicht gefunden werden!");
 	}
@@ -48,12 +51,20 @@ int main(int argc, char** argv)
 		v[i] = SVInit( (SkriptToken ) i ); 
 		
 	// Datei lesen 
-	for( SkriptToken nxtVar = FindeDkl(); nxtVar != EOF; nxtVar = FindeDkl()){
+	for( SkriptToken nxtVar = FindeDkl(); nxtVar != GEOF; nxtVar = FindeDkl()){
 		if( nxtVar != UNEXPECTED )
 			LeseDkl( v[ (int) nxtVar ] );
 		else
 			SyntaxError("Unerwartetes Symbol!");
 	}
+	
+	#ifdef TEST 
+		for( int i = 0; i < 5; i++)
+			PrintVar( v[i] );
+		return 0;
+	#else
+	#endif
+
 	
 }
 
@@ -68,7 +79,7 @@ static SkriptVar* SVInit( SkriptToken welche )
 {
 	SkriptVar* ret;
 	
-	if( (welche == NIL ) || (welche == EOF ) return nil;
+	if( (welche == NIL ) || (welche == GEOF ) ) return nil;
 	
 	ret = malloc( sizeof( SkriptVar ) );
 	
@@ -96,19 +107,19 @@ void SVDel( SkriptVar* toDel )
 	for( int i = 0; i < toDel->gr1Dim; i++)
 		free( toDel->wert[i] );
 	
-	free( toDel)
+	free( toDel);
 }
 
 //
 // Findet nächste Deklaration
 //
 
-static SkriptToken FindeDekl()
+static SkriptToken FindeDkl()
 {
-	const PStatus* st const = Status();
+	const PStatus* const st  = Status();
 	
 	if( feof(st->datei) ) 		//Dateiende erreicht
-		return EOF;
+		return GEOF;
 	
 	if( Cur() == ';') 		    
 		Fwd();
@@ -118,11 +129,11 @@ static SkriptToken FindeDekl()
 	switch( Cur() ){
 	case 'l':
 	case 'L':
-		return (( Next() == 'i' ) || (Next() == 'I' ) ? LIBARY : LANGUAGE;
+		return (( Next() == 'i' ) || (Next() == 'I' )) ? LIBARY : LANGUAGE;
 		
 	case 'o':
 	case 'O':
-		return (( Next() == 'u') || (Next() == 'U') ? OUTPUT : OPTIONS;
+		return (( Next() == 'u') || (Next() == 'U')) ? OUTPUT : OPTIONS;
 		
 	case 'c':
 	case 'C':
@@ -134,25 +145,26 @@ static SkriptToken FindeDekl()
 	
 	default:
 		return UNEXPECTED;
+	}
 }
 
 
 
-static void LeseDekl( SkriptVar* v )
+static void LeseDkl( SkriptVar* v )
 {
 	int indx;
-	
+	printf("\nLeseDkl():\n");
 	if( v->wert != nil ){  //Variable wird redefiniert? 
 		Error( "Versuch Variable zu redefinieren!" ); 
-	}else if( v->multiVar ){
-		v-wert = calloc( sizeof( char* ), 5 );
+	}else if( v->multiWert ){
+		v->wert = calloc( sizeof( char* ), 5 );
 		v->gr1Dim = 5;
 	}else{
-		v->wert = malloc( Sizeof( char* ) );
-		v->grim1Dim = 1;
+		v->wert = malloc( sizeof( char* ) );
+		v->gr1Dim = 1;
 	}
 	
-	if( v->wert )
+	if( !v->wert )
 		Error("Speicher-Fehler: Malloc/Calloc gibt nil zurück!");
 	
 	// Der Zeiger ist auf einem Buchstaben.
@@ -162,9 +174,12 @@ static void LeseDekl( SkriptVar* v )
 	
 	if( Cur() != ':' ){
 		SyntaxError( "\':\' nach dem Namen erwartet!");
+	}
 		
 	while( NachsterWert( ) ){
+		Fwd();
 		Skip();
+		printf("Nächster Wert: %c", Cur());
 		if( Cur() != '\"' ) 
 			SyntaxError("\'\"\' vor Wert erwartet!");
 		
@@ -172,7 +187,7 @@ static void LeseDekl( SkriptVar* v )
 		if( indx >= v->gr1Dim ){
 			v->wert = realloc( v->wert, v->gr1Dim += 2 );
 			if( !v->wert ){
-				Error( "Realloc gibt NIL zurück!"),
+				Error( "Realloc gibt NIL zurück!");
 			}
 		}
 		
@@ -193,12 +208,14 @@ static bool NachsterWert()
 	
 	Skip();
 	
-	if( (Cur() == ',') || (Cur() == ':')
+	if( (Cur() == ',') || (Cur() == ':')) 
 		return true;
 	else if( Cur() == ';' )
 		return false;
-	else
-		SynatxError( "Unerwartets Symbol: ',' oder ';' erwartet!");
+	else{   
+		SyntaxError( "Unerwartets Symbol: ',' oder ';' erwartet!");
+		return false; //Unerreichbar, damit GCC ruhe gibt
+	}
 }
 
 //
@@ -213,18 +230,18 @@ static void LeseWert( SkriptVar* v, int indx )
 	// Zeiger auf dem '"' ?
 	if( Cur() != '\"' )
 		Error( "LeseNachsterWert: DateiZeiger sollte zu Beginn auf \" stehen!");
-	else if( v->wert && (!v->multiVal) )	 // Kann eigentlich nur einen Wert haben 
+	else if( v->wert && (!v->multiWert) )	 // Kann eigentlich nur einen Wert haben 
 		SyntaxError( "Variable kann nur eine Wert annehmen ");
 	
-	v->wert[index] = malloc( sizeof(char) * 100 );
-	if( !v->wert[index] )
+	v->wert[indx] = malloc( sizeof(char) * 100 );
+	if( !v->wert[indx] )
 		Error("Speicher-Fehler: Malloc() gibt nil zurück");
 	
 	while( Cur() != '\"'){
 	
 		if( strIndx <= strMaxIndx ){  //Reicht Platz im Array noch aus?
-			v->wert[index] = realloc( v->wert[index], strMaxWert += 20 );
-			if( v->wert[index] )
+			v->wert[indx] = realloc( v->wert[indx], strMaxIndx += 20 );
+			if( v->wert[indx] )
 				Error("Speicher-Fehler: Realloc() gibt nil zurück!");
 		}
 		
@@ -235,13 +252,39 @@ static void LeseWert( SkriptVar* v, int indx )
 }
 
 
+//
+// Gibt eine Variable aus
+//
 	
-	
+void PrintVar( SkriptVar* v)
+{
+		char* name;
 		
+		switch( v->name ){
+		case COMPILER:
+			name = "COMPILER";
+			break;
+		case LIBARY:
+			name = "LIBARY";
+			break;
+		case LANGUAGE:
+			name = "LANGUAGE";
+			break;
+		case OUTPUT:
+			name = "OUTPUT";
+			break;
+		case OPTIONS:
+			name = "OPTIONS";
+			break; 
+		}
 		
+		printf("\n\n%s:\n", name);
+		for( int i = 0; i < v->gr1Dim; i++){
+			printf("\t[%d]: %s", i, v->wert[i]);
+		}
+}
 
-	
-	
+
 	
 		
 

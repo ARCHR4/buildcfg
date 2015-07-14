@@ -65,7 +65,7 @@ noreturn void Error( const char* msg )
 noreturn void SyntaxError( const char* msg ) 
 {
 	const PStatus* const st = Status();
-	fprintf(stderr, "Syntax Error: %s  (Line %d )", msg, GetLineCount());
+	fprintf(stderr, "Syntax Error: %s  (Line %d, Zeichen %d)", msg, GetLineCount(), ftell( st->datei ));
 	BaseClose();
 	printf("pause");
 	system("pause");
