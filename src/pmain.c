@@ -65,13 +65,13 @@ int main(int argc, char** argv)
 	
 	#ifdef TEST 
 		system("PAUSE");
-		system("cls");
-		printf("Werte:\n\n");
-		for( int i = 0; i < 5; i++){
-			printf("\t");
+		printf("\n\nWerte:\n\n");
+		for( int i = 0; i < 6; i++){
 			PrintVar( v[i] );
 			printf("\n");
 		}
+		printf("\n\n");
+		system("pause");
 		return 0;
 	#else
 	#endif
@@ -126,19 +126,16 @@ void SVDel( SkriptVar* toDel )
 static SkriptToken FindeDkl()
 {
 	const PStatus* const st  = Status();
-	int skipEOF = 0;
 	
 	printf("\n\nIn FindeDkl():\n");
 	
-	if( Cur() == ';') 		    
+	if( Cur() == ';' )
 		Fwd();
 		
 	Skip();  //Nächstes druckbares Zeichen
 	
-	if( feof(st->datei) ){ 		//Dateiende erreicht?
-		printf("\treturn EOF!\n" );
+	if( feof(st->datei))
 		return GEOF;
-	}
 	
 	switch( Cur() ){
 	case 'l':
@@ -155,6 +152,9 @@ static SkriptToken FindeDkl()
 	case 'i':
 	case 'I':
 		return IGNOREDIR;
+		
+	case EOF:
+		return GEOF;
 	
 	default:
 		return UNEXPECTED;
@@ -306,11 +306,15 @@ void PrintVar( SkriptVar* v)
 			break;
 		case OPTIONS:
 			name = "OPTIONS";
-			break; 
+			break;
+		case IGNOREDIR:
+			name = "IGNOREDIR";
+			break;
 		}
 		
 		printf("\n\n%s:\n", name);
-		for( int i = 0; i < v->gr1Dim; i++){
+		for( int i = 0; (i < v->gr1Dim) && v->wert[i]; i++){
+			
 			printf("\t[%d]: %s", i, v->wert[i]);
 		}
 }

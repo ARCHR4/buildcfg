@@ -32,7 +32,11 @@
 	
 	int GetLineCount();
 	
+	int GetPosInLine();
+	
 	int Skip();
+	
+	bool Eof();
 	
 	#define nil ((void*) 0)
 	

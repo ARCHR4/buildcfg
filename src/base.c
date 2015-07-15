@@ -47,11 +47,12 @@ bool BaseInit(const char* projPfd )
 	
 	base->datei = fopen( tmpCpy, "r"); 
 	
-	if( !(base->datei) ) 
+	if( !(base->datei) ){
+		printf("Datei konnte icht geoeffnet werden!");
 		return false;
-	else
+	}else{
 		printf("\tDatei erfolgreich geoeffnet, Cur(): %c\n\n", Cur() );
-	
+	}
 	
 	base->dir   = projPfd;
 	base->pfad  = tmpCpy;
@@ -99,6 +100,7 @@ const PStatus* const Status()
 int Cur()
 {
 	int ret = fgetc( base->datei );
+	if( ret == EOF ) return EOF;	//Beim Auftreten von Eof müssen alle Dateioperationen geblockt werden
 	//wieder zurück auf ursprüngliche position
 	fseek( base->datei, -1, SEEK_CUR);
 	return ret;
@@ -114,6 +116,7 @@ int Next()
 	int ret; 
 	fseek( base->datei, 1, SEEK_CUR );
 	ret = Cur();
+	if( ret == EOF ) return EOF;
 	fseek( base->datei, -1, SEEK_CUR );
 	return ret;
 }
@@ -129,6 +132,7 @@ int Last()
 	
 	fseek( base->datei, -1, SEEK_CUR );
 	ret = Cur();
+	if( ret == EOF ) return EOF;
 	fseek( base->datei, 1, SEEK_CUR );
 	return ret;
 }
@@ -141,6 +145,7 @@ int Last()
 
 int Fwd()
 {
+	int ret;
 	fseek( base->datei, 1, SEEK_CUR );
 	return Cur();
 }
@@ -152,8 +157,24 @@ int Fwd()
 
 int Rwd() 
 {
+	int ret;
 	fseek( base->datei, -1, SEEK_CUR );
 	return Cur();
+}
+
+//
+// Prüft das aktuelle Zeichen auf Dateiende (EOF)
+// Wenn EOF gesetzt ist, wird die Position nicht zurückgesetzt
+// 
+
+bool Eof()
+{
+	if( feof(base->datei) || (Cur() == EOF) )
+		return true;
+	else{
+		fseek( base->datei, -1, SEEK_CUR);
+		return false;
+	}
 }
 
 // 
@@ -163,9 +184,10 @@ int Rwd()
 int Skip()
 {
 	printf("\nSkip()\n");
-	while( !feof( base->datei ) ){
+	while( (!feof(base->datei)) && (Cur() != EOF) ){
 		switch( Cur() ){
 		//Nicht Druckbare zeichen ignorieren
+		printf("Skip: Loop: Nichts Druckbares!\n");
 		case '\t':
 		case '\a': 
 		case '\b':
@@ -178,15 +200,23 @@ int Skip()
 			break;
 			
 		case '/':	//Kommentar
-			if( Fwd() == '/')	//Kommentar oder doch nur ein / ?
-				while( Cur() != '\n' ) Fwd();
+			printf("Skip Loop: Kommentar!\n");
+			if( Next() == '/')	//Kommentar oder doch nur ein / ?
+				while( (!feof(base->datei) && (Cur() != EOF)) && (Cur() != '\n') ) Fwd();
+			else
+				return 0;
 			break;
+		
+		case EOF:
+			printf("Skip Loop: EOF");
+			return 1;
 		
 		default:
 			printf("Skip() beendet, gefundenes Zeichen %c\n", Cur());
 			return 0; 
 		}
 	}
+	printf("Skip beendet, EOF!");
 	return 1; 
 }
 
@@ -216,6 +246,20 @@ int GetLineCount()
 	return ret;
 }
 	
+	
+//
+// Ermittelt die Position in der Aktuellen Zeile
+//
+
+int GetPosInLine( )
+{
+	int i = 0, curPos = ftell( base->datei );
+	for(i; Cur() != '\n'; i--)
+		Rwd();
+	fseek(base->datei, curPos, SEEK_SET);
+	return i*-1;
+}
+	
 
 
 // 
@@ -230,7 +274,7 @@ void BaseUnitTest()
 	
 	printf("\n\t\t\tTEST BEGINN");
 	
-	baseOk = BaseInit("G:\\Code\\build\\unittest\\base");
+	baseOk = BaseInit("G:\\Coding\\buildcfg\\unittest\\base");
 	
 	if(!baseOk){
 		printf("\aDatei konnte nicht geoeffnnet werden\n\n");

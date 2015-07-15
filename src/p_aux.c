@@ -65,7 +65,7 @@ noreturn void Error( const char* msg )
 noreturn void SyntaxError( const char* msg ) 
 {
 	const PStatus* const st = Status();
-	fprintf(stderr, "Syntax Error: %s  (Line %d, Zeichen %d)", msg, GetLineCount(), ftell( st->datei ));
+	fprintf(stderr, "Syntax Error: %s  (Line %d, Zeichen %d)", msg, GetLineCount(), GetPosInLine());
 	BaseClose();
 	system("pause");
 	exit(0);
@@ -84,7 +84,7 @@ noreturn void AuxUnitTest()
 	if( arr ) printf("\n ... erfolgreich!\n\n");
 	
 	printf(" Den Parser ueber die Test-Datei laufen lassen...\n");
-	BaseInit( "G:\\Code\\build\\unittest\\GetLine" );
+	BaseInit( "G:\\Coding\\buildcfg\\unittest\\GetLine" );
 	Skip();
 	
 	
