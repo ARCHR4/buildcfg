@@ -126,6 +126,7 @@ int Next()
 int Last()
 {
 	int ret;
+	
 	fseek( base->datei, -1, SEEK_CUR );
 	ret = Cur();
 	fseek( base->datei, 1, SEEK_CUR );
@@ -157,12 +158,13 @@ int Rwd()
 
 // 
 // Überspringt alle Leerzeichen, Kommentare und nicht druckbare zeichen
+//
 
-void Skip()
+int Skip()
 {
-	while( !feof( base->datei) ){
-		switch( Cur()){
-		
+	printf("\nSkip()\n");
+	while( !feof( base->datei ) ){
+		switch( Cur() ){
 		//Nicht Druckbare zeichen ignorieren
 		case '\t':
 		case '\a': 
@@ -181,9 +183,11 @@ void Skip()
 			break;
 		
 		default:
-			return;
+			printf("Skip() beendet, gefundenes Zeichen %c\n", Cur());
+			return 0; 
 		}
 	}
+	return 1; 
 }
 
 //
