@@ -2,20 +2,18 @@
 /*
 *
 * p_aux.c / p_aux.h
-* Hilfsfunktionen, die auf base aufbauen
+* Hilfsfuktionen zur Fehlerbehandlung.
+* Erforden base.c.
+*
 */
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <windows.h>
+#include <errno.h>
 
 #include "inc\base.h"
 #include "inc\p_aux.h" 
-
-
-//
-// Ziemlich selbst erklärent
-//
 
 void** _Alloc2DArray( int size, int dim1, int dim2 )
 {
@@ -45,13 +43,14 @@ void** _Alloc2DArray( int size, int dim1, int dim2 )
 
 
 //
-//	Error( const char* msg, bool fatal) -> x 
-//  Gibt msg aus und beendet das Programm
+//	Gibt eine Fehlermeldung <msg> aus und beendet das Programm.
+//  Gibt zusätlich den Fehler-Code des Systems aus.
 //
 
 noreturn void Error( const char* msg )
 {
-		fprintf( stderr, "\n\n\aFatal Error: %s\n\n", msg);
+		perror( msg );
+		printf("\n\n");
 		BaseClose();
 		system("pause");
 		exit(0);
@@ -59,7 +58,7 @@ noreturn void Error( const char* msg )
 
 
 //
-// Wie Error, nur auf Syntax Fehler im Script bezogen
+// Füt der Fehlermeldung <msg> zusätzlich noch Zeilen- u. Positionsangaben hinzu.
 //
 
 noreturn void SyntaxError( const char* msg ) 

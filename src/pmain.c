@@ -2,15 +2,16 @@
 /*
 *
 *	PMAIN.C:
-*	Der wirkliche Parser. Filtert die Datein aus dem Skript
-*	und übergibt sie an das nächste Modul.
-*
+*	Dursucht die Datei nach Variablen-Deklarationen,
+*	filtert die Daten heraus und übergibt sie ans 
+*	nächste Modul.
 *
 */
 
 
 #include <windows.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <ctype.h>
 
@@ -108,7 +109,7 @@ static SkriptVar* SVInit( SkriptToken welche )
 
 
 //
-// Zerstört eine Vaariable wieder
+// Löscht eine Variable wieder.
 //
 	
 void SVDel( SkriptVar* toDel )
@@ -120,7 +121,7 @@ void SVDel( SkriptVar* toDel )
 }
 
 //
-// Findet nächste Deklaration
+// Findet nächste Variablen-Deklaration in der Datei.
 //
 
 static SkriptToken FindeDkl()
@@ -129,10 +130,10 @@ static SkriptToken FindeDkl()
 	
 	printf("\n\nIn FindeDkl():\n");
 	
-	if( Cur() == ';' )
+	if( Cur() == ';' ) //Ende der letzten Dekl.
 		Fwd();
 		
-	Skip();  //Nächstes druckbares Zeichen
+	Skip(); 
 	
 	if( feof(st->datei))
 		return GEOF;
@@ -161,7 +162,9 @@ static SkriptToken FindeDkl()
 	}
 }
 
-
+//
+//  Liest Deklaration, nachdem sie mit FindeDkl() gefunden wurde.
+//
 
 static void LeseDkl( SkriptVar* v )
 {
@@ -219,7 +222,7 @@ static void LeseDkl( SkriptVar* v )
 
 
 //
-// Prüft ob eine Deklaration weitergeht
+// Testes, ob noch ein Wert für die aktuelle Variable spezifiziert ist.
 //
 
 static bool NachsterWert()
@@ -244,7 +247,8 @@ static bool NachsterWert()
 }
 
 //
-// Liest Wert in einer Deklaration, erwartet das der Dateizeiger auf dem ' " ' steht
+// Liest Wert in einer Variablen-Deklaration, 
+// erwartet das der Dateizeiger auf dem ' " ' steht
 //
 
 static void LeseWert( SkriptVar* v, int indx )
@@ -347,4 +351,16 @@ void PrintVarName( SkriptToken v )
 		
 		printf("Variable: %s\n");
 }
+
+
+//
+// Prüft ob eine Variable gültig ist, dh. ihr schon ein Wert zugewiesen wurde
+// 
+
+bool SVIsValid( const SkriptVar* v )
+{
+	return (v->wert != nil ) 
+}
+
+
 

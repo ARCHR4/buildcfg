@@ -1,7 +1,6 @@
 
 /*
 *		PMAIN.H
-*		Implementiert Struktur die Optionen aus dem Skript speichert
 *
 */
 
@@ -14,6 +13,7 @@
 	//
 	
 	typedef enum{
+		GEOF = -3,	// Für GetNextVar(), um anzuzeigen dass keine weitren Variablen vorliegen
 		NIL = -2,  	// Nicht definiert
 		UNEXPECTED = -1, // Synatx Error
 		LANGUAGE,
@@ -21,8 +21,7 @@
 		OUTPUT,
 		LIBARY,
 		OPTIONS,
-		IGNOREDIR,
-		GEOF = -3,	// Für GetNextVar(), um anzuzeigen dass keine weitren Variablen vorliegen
+		IGNOREDIR,	
 	} SkriptToken;
 	
 	//
@@ -31,11 +30,13 @@
 	
 	typedef struct{
 		SkriptToken name; 			// Welcher Wert wird repräsentiert?
-		bool		multiWert;
-		char**		wert;
+		bool		multiWert;	    // Kann mehrere Werte aufnehmen?
+		char**		wert;			
 		int         gr1Dim;		    // 1. Dimension des wert-Arrays
 	} SkriptVar;
 	
 	void PrintVar( SkriptVar* );
 	void SVDel( SkriptVar* );
+	
+	bool SVIsValid( const SkriptVar* );
 #endif

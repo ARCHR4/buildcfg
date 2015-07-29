@@ -8,21 +8,17 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "inc/base.h"
+#include "inc\base.h"
 
 //
-//	Speichert Status des Moduls
+//	Speichert Datei-Handler zwischen den Funktionen.
 //
 
 static PStatus* base;
 
-/*
-* Interface zum Kommunizieren mit dem Modul
-*/
-
 //
-//	BaseInit (projektVerzeichnis : string ) -> bool erfolgreich
-//	Initalisiert modul
+//	Initialisiert den Datei-Handler.
+//	true/false bei Erfolg/Fehler.
 //
 
 bool BaseInit(const char* projPfd )
@@ -38,9 +34,9 @@ bool BaseInit(const char* projPfd )
 	
 	if( (!base) || (!tmpCpy) ) return false;
 	
-	// Build-Datei sollte unter projPfad\build.cfg gespeichert sein
+	// Build-Datei sollte unter projPfad\build.cfg gespeichert sein.
 	
-	strcpy( tmpCpy, projPfd );	//Pfad zu Datei erstellen
+	strcpy( tmpCpy, projPfd );	//Pfad zu Datei erstellen.
 	strcat(tmpCpy, "\\build.bcfg" );
 	
 	printf("\tPfad: %s\n\n", tmpCpy);
@@ -64,51 +60,45 @@ bool BaseInit(const char* projPfd )
 
 
 //
-// Schließt Modul
+// Schließt Datei-Handle.
 //
 
 void BaseClose()
 {
-	free( (void*) base->pfad );
 	fclose( base->datei );
 	free( (void*) base );
 	base = nil;
 }
 
 //
-// Fragt Status der Datei abort
+// Ermöglicht anderen Funktionen, auf das Handle zuzugreifen.
 //
 
 const PStatus* const Status()
 {
 	return (const PStatus* const) base;
 }
-
-/*
-*  Dateioperationen Vor, Zurück, usw... 
-*  Cur(), Next(), Last() verändern dabei die Position in d. datei nicht,
-*  Fwd() und Rwd() schon
-*/
-
 	
 	
 //
-// Cur() -> int 
-// Gibt das aktuelle Zeichen zurück
+// Cur():
+// Gibt das aktuelle Zeichen zurück. 
+// Verändert die Position in der Datei nicht.
 //	
 
 int Cur()
 {
 	int ret = fgetc( base->datei );
-	if( ret == EOF ) return EOF;	//Beim Auftreten von Eof müssen alle Dateioperationen geblockt werden
+	if( ret == EOF ) return EOF;	//Beim Auftreten von Eof müssen alle Dateioperationen geblockt werden.
 	//wieder zurück auf ursprüngliche position
 	fseek( base->datei, -1, SEEK_CUR);
 	return ret;
 }
 
 //
-// Next() -> int 
-// Gibt nächstes Zeichen zurück
+// Next():
+// Gibt nächstes Zeichen zurück.
+// Verändert die Position in der Datei nicht.
 //
 
 int Next() 
@@ -122,8 +112,8 @@ int Next()
 }
 
 //
-// Last() -> int
-// Was macht es wohl?
+// Gibt das Lezte Zeichen zurück.
+// Verändert die Position in der Datei nicht.
 //
 
 int Last()
@@ -139,8 +129,7 @@ int Last()
 
 
 //
-//  Fwd() -> int
-//	veschiebt Zeiger auf nächste Zeichen und gibt es zurück
+//	veschiebt den Datei-Zeiger auf nächste Zeichen und gibt es zurück.
 //
 
 int Fwd()
@@ -151,8 +140,7 @@ int Fwd()
 }
 
 //
-// Rwd() -> int
-// verschiebt Zeger auf letztes Zeichen und gibt es zurück
+// Verschiebt  den Datei-Zeiger auf letztes Zeichen und gibt es zurück.
 //
 
 int Rwd() 
@@ -164,7 +152,7 @@ int Rwd()
 
 //
 // Prüft das aktuelle Zeichen auf Dateiende (EOF)
-// Wenn EOF gesetzt ist, wird die Position nicht zurückgesetzt
+// Wenn EOF gesetzt ist, wird die Position in der Datei nicht zurückgesetzt.
 // 
 
 bool Eof()
@@ -178,7 +166,7 @@ bool Eof()
 }
 
 // 
-// Überspringt alle Leerzeichen, Kommentare und nicht druckbare zeichen
+// Überspringt alle Leerzeichen, Kommentare und nicht-druckbare Zeichen.
 //
 
 int Skip()
@@ -186,7 +174,8 @@ int Skip()
 	printf("\nSkip()\n");
 	while( (!feof(base->datei)) && (Cur() != EOF) ){
 		switch( Cur() ){
-		//Nicht Druckbare zeichen ignorieren
+		
+		//Nicht-druckbare Zeichen
 		printf("Skip: Loop: Nichts Druckbares!\n");
 		case '\t':
 		case '\a': 
@@ -199,10 +188,10 @@ int Skip()
 			Fwd();
 			break;
 			
-		case '/':	//Kommentar
+		case '/':	//Kommentar (//)
 			printf("Skip Loop: Kommentar!\n");
-			if( Next() == '/')	//Kommentar oder doch nur ein / ?
-				while( (!feof(base->datei) && (Cur() != EOF)) && (Cur() != '\n') ) Fwd();
+			if( Next() == '/')	//Kommentar oder doch nur ein einzelner Backslash?
+				while( (!feof(base->datei) && (Cur() != EOF)) && (Cur() != '\n') ) Fwd(); //Zur Nächsten Zeile gehen.
 			else
 				return 0;
 			break;
@@ -221,7 +210,7 @@ int Skip()
 }
 
 //
-// Gibt die Anzahl Zeilen bis zur aktuellen Position zurück
+// Gibt die Anzahl Zeilen bis zur aktuellen Position zurück.
 //
 
 int GetLineCount()
@@ -248,7 +237,7 @@ int GetLineCount()
 	
 	
 //
-// Ermittelt die Position in der Aktuellen Zeile
+// Ermittelt die Position in der Aktuellen Zeile.
 //
 
 int GetPosInLine( )
@@ -260,11 +249,6 @@ int GetPosInLine( )
 	return i*-1;
 }
 	
-
-
-// 
-// Testet Modul
-//
 
 void BaseUnitTest() 
 {
