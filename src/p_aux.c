@@ -49,16 +49,16 @@ void** _Alloc2DArray( int size, int dim1, int dim2 )
 
 noreturn void Error( const char* msg )
 {
-		perror( msg );
-		printf("\n\n");
-		BaseClose();
-		system("pause");
-		exit(0);
+	perror( msg );
+	printf("\n\n");
+	BaseClose();
+	system("pause");
+	exit(0);
 }
 
 
 //
-// Füt der Fehlermeldung <msg> zusätzlich noch Zeilen- u. Positionsangaben hinzu.
+// Fügt der Fehlermeldung <msg> zusätzlich noch Zeilen- u. Positionsangaben hinzu.
 //
 
 noreturn void SyntaxError( const char* msg ) 

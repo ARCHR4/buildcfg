@@ -83,7 +83,7 @@ int main(int argc, char** argv)
 
 
 //
-// Erstellt und initialisiert eine neue Variable
+// Erstellt und initialisiert eine neue Variable.
 //
 
 
@@ -164,6 +164,7 @@ static SkriptToken FindeDkl()
 
 //
 //  Liest Deklaration, nachdem sie mit FindeDkl() gefunden wurde.
+//  Der Dateizeiger befindet sich auf dem ersten Buchstaben des Namens.
 //
 
 static void LeseDkl( SkriptVar* v )
@@ -248,7 +249,8 @@ static bool NachsterWert()
 
 //
 // Liest Wert in einer Variablen-Deklaration, 
-// erwartet das der Dateizeiger auf dem ' " ' steht
+// erwartet das der Dateizeiger auf dem Anführungszeichen zu Beginnn des 
+// Wertes steht steht.
 //
 
 static void LeseWert( SkriptVar* v, int indx )
@@ -288,7 +290,7 @@ static void LeseWert( SkriptVar* v, int indx )
 
 
 //
-// Gibt eine Variable aus
+// Gibt eine Variable aus.
 //
 	
 void PrintVar( SkriptVar* v)
@@ -323,7 +325,9 @@ void PrintVar( SkriptVar* v)
 		}
 }
 
-
+//
+// Gibt den Namen einer Variable aus.
+// 
 
 void PrintVarName( SkriptToken v )
 {
@@ -354,7 +358,7 @@ void PrintVarName( SkriptToken v )
 
 
 //
-// Prüft ob eine Variable gültig ist, dh. ihr schon ein Wert zugewiesen wurde
+// Prüft ob eine Variable gültig ist, dh. ihr schon ein Wert zugewiesen wurde.
 // 
 
 bool SVIsValid( const SkriptVar* v )

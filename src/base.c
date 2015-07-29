@@ -219,7 +219,7 @@ int GetLineCount()
 	long int curP = ftell( base->datei );
 
 	
-	// Alle \n vom Dateinfan´g bis zur aktuellen position zählen
+	// Alle \n vom Dateinfang bis zur aktuellen Position zählen.
 	
 	rewind( base->datei ); 
 	

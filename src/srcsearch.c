@@ -107,7 +107,7 @@ static char* GetEntryPath( struct dirent* entry, const char* path )
 //
 
 static int GetEntryType( struct dirent* restrict entry, const char* entryPath, const char** ignoreList, 
-						 int listCount )
+						int listCount )
 {
 	struct stat attrb;
 	int succes = stat( entryPath, &attrb );
