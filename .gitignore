@@ -2,5 +2,7 @@ $cat .gitignore
 *.cmd
 *.bat
 *.exe
+*.bcfg
 unittest/ 	#So it does not appear in master
 testprojekt/
+build/

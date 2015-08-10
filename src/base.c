@@ -27,12 +27,14 @@ bool BaseInit(const char* projPfd )
 	
 	printf(" \nIn BaseInit:\n\n ");
 	
-	if( !projPfd ) return false;
+	if( !projPfd ) 
+		return false;
 	
 	base = malloc( sizeof( PStatus ) );
 	tmpCpy = malloc( strlen(projPfd) + strlen("\\build.bcfg") + 5 );
 	
-	if( (!base) || (!tmpCpy) ) return false;
+	if( (!base) || (!tmpCpy) ) 
+		return false;
 	
 	// Build-Datei sollte unter projPfad\build.cfg gespeichert sein.
 	
@@ -89,7 +91,8 @@ const PStatus* const Status()
 int Cur()
 {
 	int ret = fgetc( base->datei );
-	if( ret == EOF ) return EOF;	//Beim Auftreten von Eof müssen alle Dateioperationen geblockt werden.
+	if( ret == EOF ) 
+		return EOF;	//Beim Auftreten von Eof müssen alle Dateioperationen geblockt werden.
 	//wieder zurück auf ursprüngliche position
 	fseek( base->datei, -1, SEEK_CUR);
 	return ret;
@@ -106,7 +109,8 @@ int Next()
 	int ret; 
 	fseek( base->datei, 1, SEEK_CUR );
 	ret = Cur();
-	if( ret == EOF ) return EOF;
+	if( ret == EOF ) 
+		return EOF;
 	fseek( base->datei, -1, SEEK_CUR );
 	return ret;
 }
@@ -122,7 +126,8 @@ int Last()
 	
 	fseek( base->datei, -1, SEEK_CUR );
 	ret = Cur();
-	if( ret == EOF ) return EOF;
+	if( ret == EOF ) 
+		return EOF;
 	fseek( base->datei, 1, SEEK_CUR );
 	return ret;
 }
@@ -134,7 +139,6 @@ int Last()
 
 int Fwd()
 {
-	int ret;
 	fseek( base->datei, 1, SEEK_CUR );
 	return Cur();
 }
@@ -145,7 +149,6 @@ int Fwd()
 
 int Rwd() 
 {
-	int ret;
 	fseek( base->datei, -1, SEEK_CUR );
 	return Cur();
 }

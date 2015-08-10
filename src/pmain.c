@@ -15,11 +15,12 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#include "inc/base.h"
-#include "inc/p_aux.h"
-#include "inc/pmain.h"
+#include "inc\base.h"
+#include "inc\p_aux.h"
+#include "inc\pmain.h"
+#include "inc\glue.h"
 
-#define TEST
+/* #define TEST */ 
 
 static SkriptVar* SVInit( SkriptToken );
 
@@ -75,6 +76,7 @@ int main(int argc, char** argv)
 		system("pause");
 		return 0;
 	#else
+		GlueMain( v );
 	#endif
 
 	
@@ -357,14 +359,6 @@ void PrintVarName( SkriptToken v )
 }
 
 
-//
-// Prüft ob eine Variable gültig ist, dh. ihr schon ein Wert zugewiesen wurde.
-// 
-
-bool SVIsValid( const SkriptVar* v )
-{
-	return (v->wert != nil ) 
-}
 
 
 

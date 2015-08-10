@@ -34,31 +34,32 @@ void GetSrcFile( const char* lastDir, const char** ignore, 	const char* end,
 {
 	DIR* curDir = opendir( lastDir );
 	
+	printf("GetSrcFile(): \n\n");	
+	
 	if( !curDir ) 
 		Error( "Verzeichnis konnte nicht geoeffnet werden!" );
 	
 	for( struct dirent* entry = readdir( curDir ); entry; entry = readdir( curDir ) ){
 	
 		char* entryPath = GetEntryPath( entry, lastDir ); 
-		
+		printf("Schleife: \n");
 		switch( GetEntryType( entry, entryPath, ignore, ignEle ) ){
 		
 		case -1:
-		strerror( errno );
 			Error( "Fehler beim Lesen der Datei-Attribute ");
-			
 			break;
 		
 		case 0:  //Verzeichnis, soll nicht dursucht werden.
 			break;
 		
 		case 1:	//Verzeichnis, soll nicht ignoriert werden.
-			GetSrcFile( entryPath, ignore, end, writeTo, ignEle );  //Rkursion.
+			GetSrcFile( entryPath, ignore, end, writeTo, ignEle );  //Neues Verzeichnis durchsuchen
 			break; 
 		
 		case 2:	// Datei
 
 			if( strstr( entry->d_name, end ) ){				//Hat gesuchte Endung?
+				printf("Datei gefunden: %s", entryPath);
 				fprintf(writeTo, " %s ", entryPath );		//Ja -> Pfad in Ziel-Datei schreiben.
 			}
 			break;
@@ -70,6 +71,7 @@ void GetSrcFile( const char* lastDir, const char** ignore, 	const char* end,
 		free( entryPath );
 	}
 	
+	printf("\nSrcSearch() beendet!");
 	return;
 }
 
@@ -87,9 +89,10 @@ static char* GetEntryPath( struct dirent* entry, const char* path )
 	int len = strlen( entry->d_name ) + strlen("\\") + strlen( path ) + 1;
 	char* ret = calloc( sizeof(char), len );
 	
+	printf("GetEntryPath:\n");
+	
 	if( !ret ){
 		Error( "Calloc fehlgeschlagen!" );
-		return ((void*) 0);
 	}else{
 		strcpy( ret, path );
 		strcat( ret, "\\");
@@ -111,13 +114,14 @@ static int GetEntryType( struct dirent* restrict entry, const char* entryPath, c
 {
 	struct stat attrb;
 	int succes = stat( entryPath, &attrb );
+	printf("GetEntryType():\n");
 	
 	if( succes == -1 )
     	return -1;
 		
 	
 	
-	if( S_ISREG( attrb.st_mode) ){ //DAtei
+	if( S_ISREG( attrb.st_mode) ){ //Datei
 	
 		return 2; 
 		
@@ -130,14 +134,14 @@ static int GetEntryType( struct dirent* restrict entry, const char* entryPath, c
 		// Prüfen ob das Verzeichnis in der Liste steht
 		for( int i = 0; i < listCount; i++){
 			
-			if( !strcmp( entry->d_name, ignoreList[i]) ){
+			if( !strcmp( entry->d_name, ignoreList[i]) ){	// -> ignorieren.
 				return 0;
 			}
 		}
 	
-		return 1;  //Verzeichnis soll dursucht werden
+		return 1;  //Verzeichnis soll dursucht werden.
 		
-	}else{		   //Irgendwas anderes 
+	}else{		   //Gerätedatei. 
 		return 3;
 	}
 }

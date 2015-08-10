@@ -4,6 +4,7 @@
 *
 */
 
+#include <stdbool.h> 
 
 #ifndef MODULE_PMAIN
 	#define MODULE_PMAIN
@@ -37,6 +38,5 @@
 	
 	void PrintVar( SkriptVar* );
 	void SVDel( SkriptVar* );
-	
-	bool SVIsValid( const SkriptVar* );
+
 #endif
