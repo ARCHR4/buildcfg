@@ -19,8 +19,9 @@
 #include "inc\p_aux.h" 	
 
 
-static char* GetEntryPath( struct dirent* entry, const char*);
+static char* GetEntryPath( struct dirent*, const char*);
 static int   GetEntryType( struct dirent* restrict, const char*, const char**, int);
+static bool  HasEnding( char*, char*);
 
 //
 // Dursucht <lastDir> nach Dateien mit der Endung <end>.
@@ -50,15 +51,17 @@ void GetSrcFile( const char* lastDir, const char** ignore, 	const char* end,
 			break;
 		
 		case 0:  //Verzeichnis, soll nicht dursucht werden.
+			printf("Verzeichnis soll nicht dursucht werden. Break\n");
 			break;
 		
 		case 1:	//Verzeichnis, soll nicht ignoriert werden.
+			printf("\tVerzeichnis mit GetSrcFile() durchsuchen. Pfad: %s\n\n", entryPath);
 			GetSrcFile( entryPath, ignore, end, writeTo, ignEle );  //Neues Verzeichnis durchsuchen
 			break; 
 		
 		case 2:	// Datei
 
-			if( strstr( entry->d_name, end ) ){				//Hat gesuchte Endung?
+			if( HasEnding( entry->d_name, end)){				//Hat gesuchte Endung?
 				printf("Datei gefunden: %s", entryPath);
 				fprintf(writeTo, " %s ", entryPath );		//Ja -> Pfad in Ziel-Datei schreiben.
 			}
@@ -89,8 +92,6 @@ static char* GetEntryPath( struct dirent* entry, const char* path )
 	int len = strlen( entry->d_name ) + strlen("\\") + strlen( path ) + 1;
 	char* ret = calloc( sizeof(char), len );
 	
-	printf("GetEntryPath:\n");
-	
 	if( !ret ){
 		Error( "Calloc fehlgeschlagen!" );
 	}else{
@@ -114,7 +115,7 @@ static int GetEntryType( struct dirent* restrict entry, const char* entryPath, c
 {
 	struct stat attrb;
 	int succes = stat( entryPath, &attrb );
-	printf("GetEntryType():\n");
+	printf("\t\tGetEntryType():\n");
 	
 	if( succes == -1 )
     	return -1;
@@ -122,12 +123,13 @@ static int GetEntryType( struct dirent* restrict entry, const char* entryPath, c
 	
 	
 	if( S_ISREG( attrb.st_mode) ){ //Datei
-	
+		printf("\t\tDatei: Name %s\n\tBeendet\n\n", entry->d_name);
 		return 2; 
 		
 	}else if( S_ISDIR(attrb.st_mode) ){	// Entry ist eine Verzeichnis 
 		
 		if( (!strcmp( entry->d_name, "..")) || (!strcmp( entry->d_name, ".")) ){ //'.' ist das Arbeitsverzeichnis, '..' das letzte Verzeichnis 
+			printf("\t\tVerzeichnis: .. oder .\n\n");
 			return 0; 
 		}
 		
@@ -135,16 +137,37 @@ static int GetEntryType( struct dirent* restrict entry, const char* entryPath, c
 		for( int i = 0; i < listCount; i++){
 			
 			if( !strcmp( entry->d_name, ignoreList[i]) ){	// -> ignorieren.
+				printf("\t\tDatei [Soll ignoriert werden]: %s, [%d]\n\n", entry->d_name, i);
 				return 0;
 			}
 		}
 	
+		printf("\t\tVerzeichnis: Soll durchsucht werden\n\n");
 		return 1;  //Verzeichnis soll dursucht werden.
 		
 	}else{		   //Gerätedatei. 
 		return 3;
 	}
 }
+
+//
+// Stellt fest, ob eine Datei eine gewisse Endung im Namen hat
+//
+
+static bool HasEnding( char* name, char* endung)
+{
+	char* nameE = name + strlen(name) - 1;		// Ans Ende der Strings springen 
+	char* endE  = endung + strlen(endung) - 1;
+	int endLen = strlen( endung );
+	
+	for( int i = 0; i < endLen; i++ ){			// Sie rückwärts Stück für Stück von hinten
+		if( *(nameE-i) != *(endE-i) )			//  vergleichen.
+			return false;
+	}
+	
+	return true;
+}
+
 
 
 

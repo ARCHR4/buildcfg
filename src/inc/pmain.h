@@ -33,7 +33,8 @@
 		SkriptToken name; 			// Welcher Wert wird repräsentiert?
 		bool		multiWert;	    // Kann mehrere Werte aufnehmen?
 		char**		wert;			
-		int         gr1Dim;		    // 1. Dimension des wert-Arrays
+		int         gr1Dim;		    // Allokierter Platz 
+		int 		anzahlWerte;	// Tatsächlich geschriebene Werte
 	} SkriptVar;
 	
 	void PrintVar( SkriptVar* );

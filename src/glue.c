@@ -23,6 +23,10 @@
 */
 
 FILE* outputFile;
+static char* GetCompPath( char* );
+static char* GetCompName( char* );
+
+
 
 //
 // Prüft ob eine Variable gültig ist, dh. ihr schon ein Wert zugewiesen wurde.
@@ -50,10 +54,20 @@ static SkriptVar* GetSVByName( SkriptVar** varArray, SkriptToken token)
 static void WriteCompiler( SkriptVar** varArray )
 {
 	SkriptVar* comp = GetSVByName( varArray, COMPILER );
+	char* compPath, * compName; 
+	
 	if( !SVIsValid( comp ) )
 		Error("Der Compiler-Pfad wurde nicht spezifiziert [COMPILER-Option]!");
 	
-	fprintf(outputFile, "start %s", comp->wert[0]);
+	compName = GetCompName( comp->wert[0] );
+	compPath = GetCompPath( comp->wert[0] );
+	
+	
+	fprintf(outputFile, "path start %s ;%path%\n", compPath);
+	fprintf(outputFile, "start /W /B %s", compName );
+	free(compName);
+	free(compPath);
+	
 }
 
 
@@ -65,7 +79,7 @@ static void WriteOptions( SkriptVar** varArray )
 	if( !SVIsValid( opt ) )
 		return;
 	
-	for( int i = 0; i < opt->gr1Dim; i++)
+	for( int i = 0; i < opt->anzahlWerte; i++)
 		fprintf(outputFile, " %s", opt->wert[i]);
 }
 
@@ -81,7 +95,7 @@ static void WriteFiles(SkriptVar** varArray )
 		Error("Die Datei-Endung wurde nicht spezifiziert [LANGUAGE-Option]!");
 	
 	printf("\nGetSrcFile() Parameter: %s\n", ps->dir);
-	GetSrcFile( ps->dir, (const char**) ignore->wert, *(lang->wert), outputFile, ignore->gr1Dim );
+	GetSrcFile( ps->dir, (const char**) ignore->wert, *(lang->wert), outputFile, ignore->anzahlWerte );
 }
 
 
@@ -109,8 +123,8 @@ static void Setup(const char* outputPath)
 	if( !outputFile )
 		Error( "Versuch Stdin umzuleiten fehlgschlagen!" );
 	
-	fprintf(outputFile, "cd %s", ps->dir);
-	fprintf(outputFile, "pause");
+	fprintf(outputFile, "\ncd %s\n", ps->dir);
+	fprintf(outputFile, "pause\n\n");
 }
 
 
@@ -141,6 +155,57 @@ void GlueMain( SkriptVar** vars )
 	
 	fclose( stdin );
 	exit( 0 );
+}
+
+
+static char* GetCompPath( char* c)
+{
+	int len = strlen( c );
+	char* ret = calloc( sizeof(char), len);
+	char* cur = c;
+	
+	if( !ret)
+		Error("Calloc failed!");
+	
+	while( *cur != '\\' ){
+		cur--;
+		len--;
+	}
+	
+	cur--;
+	
+	for( int i = len, a = 0; i >= 0; i--, a++)
+		*(ret+a) = *(cur-1);
+	
+	return ret;
+}
+
+
+
+static char* GetCompName( char* c )
+{
+	char* ret = calloc( sizeof( char ), 30);
+	int am = 30;
+	
+	c += (strlen( c ) - 1);
+	
+	if(!ret)
+		Error("Calloc failed!");
+	
+	for( int i = 0; *c != '\\'; i++){
+	
+		if( i == am ){
+			ret = realloc( ret, am+5 );
+			if(!ret) 
+				Error("Realloc failed");
+		}
+		
+		ret[i] = *c;
+		c--;
+		am++;
+	}
+	
+	return ret;
 }
 
 

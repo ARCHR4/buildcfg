@@ -106,6 +106,7 @@ static SkriptVar* SVInit( SkriptToken welche )
 		ret->multiWert = false;
 		
 	ret->gr1Dim = 0;
+	ret->anzahlWerte = 0;
 	return ret;
 }
 
@@ -217,6 +218,7 @@ static void LeseDkl( SkriptVar* v )
 		LeseWert( v, indx );
 		printf("\nString gespeichert: %s, Aktuelles Zeichen: %c\n", v->wert[indx], Cur());
 		indx++;
+		v->anzahlWerte++;
 		
 		Skip(); //Zeiger auf ',' oder ';', damit NachsterWert arbeiten kann
 	}
