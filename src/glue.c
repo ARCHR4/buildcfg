@@ -56,14 +56,15 @@ static void WriteCompiler( SkriptVar** varArray )
 	SkriptVar* comp = GetSVByName( varArray, COMPILER );
 	char* compPath, * compName; 
 	
+	printf("WriteCompiler()\n");
 	if( !SVIsValid( comp ) )
 		Error("Der Compiler-Pfad wurde nicht spezifiziert [COMPILER-Option]!");
 	
 	compName = GetCompName( comp->wert[0] );
 	compPath = GetCompPath( comp->wert[0] );
+	printf("\n\tCompName = %s,\n\tCompPath = %s\n", compName, compPath);
 	
-	
-	fprintf(outputFile, "path start %s ;%path%\n", compPath);
+	fprintf(outputFile, "path %s ;%%path%%\n", compPath);
 	fprintf(outputFile, "start /W /B %s", compName );
 	free(compName);
 	free(compPath);
@@ -79,8 +80,12 @@ static void WriteOptions( SkriptVar** varArray )
 	if( !SVIsValid( opt ) )
 		return;
 	
+	printf("WrtiteOPtions():");
+	
 	for( int i = 0; i < opt->anzahlWerte; i++)
 		fprintf(outputFile, " %s", opt->wert[i]);
+	
+	printf("\n\tBeendet.\n");
 }
 
 
@@ -91,7 +96,7 @@ static void WriteFiles(SkriptVar** varArray )
 	const PStatus* const ps = Status();
 	
 	printf("\nWriteFiles():\n\n");
-	if( !SVIsValid( lang ) )
+	if( !SVIsValid(lang) )
 		Error("Die Datei-Endung wurde nicht spezifiziert [LANGUAGE-Option]!");
 	
 	printf("\nGetSrcFile() Parameter: %s\n", ps->dir);
@@ -157,56 +162,78 @@ void GlueMain( SkriptVar** vars )
 	exit( 0 );
 }
 
+//
+//Extrahiert den Pfad (ohne Name) der Datei aus dem kompletten Pfad.
+//
 
 static char* GetCompPath( char* c)
 {
-	int len = strlen( c );
-	char* ret = calloc( sizeof(char), len);
-	char* cur = c;
+	int len = strlen(c), nameLen = 0, pathLen = 0;
+	char* cur = c + len, * brk = nil, * ret = nil;
 	
-	if( !ret)
-		Error("Calloc failed!");
+	printf("GetCompPath():\n\tLen = %d,\n\t Pfad: %s\n", len, c);
 	
-	while( *cur != '\\' ){
-		cur--;
-		len--;
-	}
+	for( cur; *cur != '\\'; cur--)	//Letzten Backslash merken
+		nameLen++;
 	
-	cur--;
+	brk = cur; 	// Position des letzten Backslash merken.
+	pathLen = len - nameLen;
+	printf("\tPathLen = %d, nameLen = %d\n", pathLen, nameLen);
 	
-	for( int i = len, a = 0; i >= 0; i--, a++)
-		*(ret+a) = *(cur-1);
-	
-	return ret;
-}
-
-
-
-static char* GetCompName( char* c )
-{
-	char* ret = calloc( sizeof( char ), 30);
-	int am = 30;
-	
-	c += (strlen( c ) - 1);
-	
+	ret = calloc( sizeof(char), pathLen + 1 );
 	if(!ret)
-		Error("Calloc failed!");
+		Error("Speicher-Fehler: Calloc() fehlgeschlagen.");
 	
-	for( int i = 0; *c != '\\'; i++){
-	
-		if( i == am ){
-			ret = realloc( ret, am+5 );
-			if(!ret) 
-				Error("Realloc failed");
-		}
+	//String bis Cur kopieren.
+	for(int i = 0; (c+i) != brk ; i++){
+		ret[i] = c[i];
+		printf("\n\tC+i: %p, brk = %p, i = %d,\n\t c[i] = %c, ret[i] = %c\n", c+1, brk, i,  c[i], ret[i]);
+	}
+	printf("\n\tBeendet.\n");
+	return ret;
 		
-		ret[i] = *c;
-		c--;
-		am++;
+	
+}
+
+//
+// Extrahiert den Name einer Datei aus dem DateiPfad.
+//
+
+
+static char* GetCompName( char* p )
+{
+	char* ret = nil , *cur = nil;
+	int len = strlen( p ), nameLen = 0;
+	
+	cur = p + len;
+	
+	printf("GetCompName():\n\tLen: %d, p: %p, cur: %p\n\tpfad: %s\n", len, p, cur, p);
+	
+	for( nameLen; *cur != '\\'; nameLen++)
+		cur--;
+		
+	printf("\n\tNach 1. Schleife: nameLen: %d, cur: %p, *cur = %c\n\n", nameLen, cur, *cur);
+	printf("\n");
+	
+	ret = calloc( sizeof(char), nameLen + 1);
+	if(!ret)
+		Error("Speicher-Fehler: Calloc() fehlgeschlagen!");
+	
+	cur++;
+	
+	for( int i = 0; (cur+i) != (p+len); i++ ){
+		ret[i] = cur[i];
+		printf("\n\tRet[%d] = %c, cur[%d] = %c.\ncur = %p, P+len = %p", i, ret[i], i, cur[i], cur+i, p+len);
+		printf("\n");
 	}
 	
+	printf("Beendet.");
 	return ret;
+
 }
+
+	
+	
 
 
 	

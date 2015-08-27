@@ -49,8 +49,12 @@ void** _Alloc2DArray( int size, int dim1, int dim2 )
 
 noreturn void Error( const char* msg )
 {
-	perror( msg );
-	printf("\n\n");
+	if(errno)
+		perror( msg );
+	else
+		printf("Error: %s", msg);
+	
+	printf("\nProgramm wird beendet.\n\n");
 	BaseClose();
 	system("pause");
 	exit(0);
